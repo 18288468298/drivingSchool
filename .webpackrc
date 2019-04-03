@@ -1,0 +1,16 @@
+
+{
+    "extraBabelPlugins": [
+        ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }]
+    ],
+    "proxy": {
+      "/api": {
+        "target": "http://220.165.143.82:6810",
+        "changeOrigin": true
+      },
+      "/Profile": {
+        "target": "http://220.165.143.82:6810",
+        "changeOrigin": true
+      }
+    }
+}
