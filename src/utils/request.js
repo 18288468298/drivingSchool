@@ -48,7 +48,7 @@ export default function request(url, options) {
 	
  
   let token= getCookie('token');
-  console.log(token)
+
   if(token){
     options.headers={
     

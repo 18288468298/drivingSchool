@@ -11,16 +11,16 @@ import {
 	Modal
 } from 'antd';
 
-function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, checkedValues, tree, checkedKeys }) {
-	console.log(result, '树');
-	var sb=[];
-	if(result){
-		for(var i=0;i<result.length;i++){
-			if(result[i].isDefault){
-				sb.push(result[i].name)
-			}
-		}
-	}
+function AddUsers({ form, confirmDirty, result,results, dispatch, checked, visible, checkedValues, tree, checkedKeys,lengths,notification }) {
+	console.log(lengths, '树');
+	
+	// if(result){
+	// 	for(var i=0;i<result.length;i++){
+	// 		if(result[i].isDefault){
+	// 			lengths.push(result[i].name)
+	// 		}
+	// 	}
+	// }
 
 	const formItemLayout = {
 		labelCol: {
@@ -39,7 +39,8 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 		e.preventDefault();
 
 		form.validateFields((err, values) => {
-			console.log(values, '窝 ');
+		
+
 			if (!err) {
 				dispatch({
 					type: 'usertablemodels/setState',
@@ -48,7 +49,7 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 				dispatch({
 					type: 'usertablemodels/CreateOrUpdateUser',
 					payload: {
-						assignedRoleNames: checkedValues,
+						assignedRoleNames: lengths,
 						organizations: checkedKeys,
 						
 						sendActivationEmail: values.sendActivationEmail,
@@ -71,7 +72,7 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 			}
 		});
 	};
-
+	
 	let validateToNextPassword = (rule, value, callback) => {
 		const form = form;
 		if (value && confirmDirty) {
@@ -82,7 +83,7 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 	const Search = Input.Search;
 	const { TreeNode } = Tree;
 	let onSelect = (selectedKeys, info) => {
-		console.log('selected', selectedKeys, info);
+		// console.log('selected', selectedKeys, info);
 	};
 
 	let onCheck = (checkedKeys, info) => {
@@ -114,9 +115,10 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 		});
 	};
 	function onChange(checkedValues) {
+		
 		dispatch({
 			type: 'usertablemodels/setState',
-			payload: { checkedValues: checkedValues }
+			payload: { lengths: checkedValues }
 		});
 	}
 	const CheckboxGroup = Checkbox.Group;
@@ -261,40 +263,26 @@ function AddUsers({ form, confirmDirty, result, dispatch, checked, visible, chec
 						<TabPane
 							tab="角色"
 							tab={
-								<Badge count={checkedValues.length} offset={[ 10, 0 ]} size={'large'}>
+								<Badge count={lengths.length} offset={[ 10, 0 ]} size={'large'}>
 									角色
 								</Badge>
 							}
 							key="2"
 						>
-							{/* <CheckboxGroup
+							<CheckboxGroup
 								onChange={onChange}
-								defaultValue={[
-									'Admin'
-								]}
-							> */}
+								defaultValue={lengths}
+							>
 								{result ? (
 									result.map((items, index) => (
 										<p>
-											<Checkbox defaultChecked={items.isDefault } value={items.name} onChange={(a)=>{
-												console.log(a);
-												if(a.target.checked){
-													sb.push(a.target.value)
-												}else{
-													// console.log(sb.indexOf(a.target.value))
-													// sb.splice(a.target.value,1)
-													for(var i=0;i<sb.length;i++){
-														if(sb[i]==a.target.value){
-															sb.splice(i,1)
-														}
-													}
-												}
-												console.log(sb)
-											}}>{items.displayName}</Checkbox>
+											<Checkbox defaultChecked={items.isDefault } value={items.name}
+											
+											>{items.displayName}</Checkbox>
 										</p>
 									))
 								) : null}
-							{/* </CheckboxGroup> */}
+							</CheckboxGroup>
 						</TabPane>
 						<TabPane tab=" 组织机构" key="3">
 							<Search

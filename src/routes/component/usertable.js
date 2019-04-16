@@ -1,18 +1,50 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Table, Pagination, LocaleProvider, Badge, Dropdown, Icon, Menu, Input, ButtonMenu,Button,Modal } from 'antd';
+import {
+	Table,
+	Pagination,
+	LocaleProvider,
+	Badge,
+	Dropdown,
+	Icon,
+	Menu,
+	Input,
+	ButtonMenu,
+	Button,
+	Modal,
+	notification,
+	Checkbox,
+	Popover
+} from 'antd';
 import moment from 'moment';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import AddUsers from './addUsers';
 import CompileUsers from './compileuser';
-function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileToken, fileType, filter, tree,Ids,visibleA, }) {
-	console.log(Ids, 123);
+function UserTable({
+	dispatch,
+	users,
+	ceshi,
+	totalCount,
+	size,
+	fileName,
+	fileToken,
+	fileType,
+	filter,
+	tree,
+	Ids,
+	record,
+	success,
+	names,
+	validColumns
+}) {
+	console.log(validColumns, 123);
+
 	const fullColumns = [
 		{
 			title: ' 用户名',
 			width: 100,
-			dataIndex: 'name',
-			key: 'name+1',
+			dataIndex: 'userName',
+			key: 'userName',
 			sorter: true
 		},
 		{
@@ -63,19 +95,16 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 			dataIndex: 'isEmailConfirmed',
 			key: '789isEmailConfirmed',
 			width: 190,
-			render: (text, record) => (
-				<span>
-					{users.isEmailConfirmed ? (
-						<span>
-							<Badge status="success" />验证
-						</span>
-					) : (
-						<span>
-							<Badge status="error" /> 未验证
-						</span>
-					)}
-				</span>
-			),
+			render: (text, record) =>
+				record.isEmailConfirmed ? (
+					<span>
+						<Badge status="success" />验证
+					</span>
+				) : (
+					<span>
+						<Badge status="error" /> 未验证
+					</span>
+				),
 			sorter: true
 		},
 		{
@@ -84,38 +113,32 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 			key: 'isPhoneNumberConfirmed',
 			width: 190,
 			sorter: true,
-			render: (text, record) => (
-				<span>
-					{users.isPhoneNumberConfirmed ? (
-						<span>
-							<Badge status="success" />验证
-						</span>
-					) : (
-						<span>
-							<Badge status="error" /> 未验证
-						</span>
-					)}
-				</span>
-			)
+			render: (text, record) =>
+				record.isPhoneNumberConfirmed ? (
+					<span>
+						<Badge status="success" />验证
+					</span>
+				) : (
+					<span>
+						<Badge status="error" /> 未验证
+					</span>
+				)
 		},
 		{
 			title: '启用',
 			dataIndex: 'isActive',
 			key: '23isActive',
 			width: 100,
-			render: (text, record) => (
-				<span>
-					{users.isActive ? (
-						<span>
-							<Badge status="success" />已启用
-						</span>
-					) : (
-						<span>
-							<Badge status="error" /> 已禁用
-						</span>
-					)}
-				</span>
-			),
+			render: (text, record) =>
+				record.isActive ? (
+					<span>
+						<Badge status="success" />已启用
+					</span>
+				) : (
+					<span>
+						<Badge status="error" /> 已禁用
+					</span>
+				),
 			sorter: true
 		},
 		{
@@ -123,19 +146,16 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 			dataIndex: 'isLocked',
 			key: 'a8',
 			width: 100,
-			render: (text, record) => (
-				<span>
-					{users.isLocked ? (
-						<span>
-							<Badge status="success" />已锁定
-						</span>
-					) : (
-						<span>
-							<Badge status="error" /> 未锁定
-						</span>
-					)}
-				</span>
-			),
+			render: (text, record) =>
+				record.isLocked ? (
+					<span>
+						<Badge status="success" />已锁定
+					</span>
+				) : (
+					<span>
+						<Badge status="error" /> 未锁定
+					</span>
+				),
 			sorter: true
 		},
 		{
@@ -156,17 +176,17 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 		{
 			title: '操作',
 			key: 'operation',
-			
+			dataIndex:'operation',
 			width: 100,
 			render: (text, record) => (
 				// console.log(record2,'古树'),
-					// dispatch({
-					// 	type:'usertablemodels/setState',
-					// 	payload:{
-					// 		record:record
-					// 	}
-					// }),
-				
+				// dispatch({
+				// 	type:'usertablemodels/setState',
+				// 	payload:{
+				// 		record:record
+				// 	}
+				// }),
+
 				<Dropdown
 					overlay={menus}
 					onVisibleChange={(v) => {
@@ -180,27 +200,17 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 						// : null;
 					}}
 				>
-					<a href="javascript:;" onMouseOver={()=>{
-						console.log(record,"是")
-						var arr=[];
-						// record.roles.map((items)=>{
-						// 	items.roleName?arr.push(items.name)
-						// 	items.roleName=='Admin'?arr.push('Admin'):null,
-						// 	items.roleName=='安全员'?arr.push('50d31fd08541499eb18af45ebd0674a4'):null,
-						// 	items.roleName=='信息员'?arr.push('c7ec25e79ca54f92a3e3c9e86cabcd43'):null,
-						// 	items.roleName=='财务'?arr.push('1477abd906fc45fdbb89a0553174052b'):null}
-					
-							// ),
-					
-						dispatch({
-						
-								type:'usertablemodels/setState',
-							payload:{
-								record:record,
-								arr:arr
-							}
-						})
-					}}>
+					<a
+						href="javascript:;"
+						onMouseOver={() => {
+							dispatch({
+								type: 'usertablemodels/setState',
+								payload: {
+									record: record
+								}
+							});
+						}}
+					>
 						操作 <Icon type="down" />
 					</a>
 				</Dropdown>
@@ -208,42 +218,123 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 		}
 	];
 	// 编辑
-	const handleCancel = (e) => {
+	const showModelC = (e) => {
 		dispatch({
 			type: 'usertablemodels/setState',
-			payload: { visibleA: false }
+			payload: { visibleC: true }
 		});
 	};
-	const compile=()=>{
+	const compile = () => {
 		dispatch({
 			type: 'usertablemodels/setState',
 			payload: { visibleA: true }
 		});
-		
+	};
+	const jurisdiction = () => {
+		dispatch({
+			type: 'usertablemodels/setState',
+			payload: { visibleB: true }
+		});
+
+		dispatch({
+			type: 'usertablemodels/GetUserPermissionsForEdit',
+			payload: {
+				id: record.id
+			}
+		});
+	};
+	const confirm = Modal.confirm;
+	// 修改密码
+	function showConfirm() {
+		console.log(record);
+		confirm({
+			title: '警告',
+			content: '你确定要重置用户' + record.name + '的登录密码么?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/ResetUserPassword',
+					payload: {
+						id: record.id
+					}
+				});
+			},
+			onCancel() {
+				console.log('Cancel');
+			}
+		});
+	}
+	// 禁用
+	success
+		? Modal.success({
+				title: '操作成功',
+				content: '您已成功切换' + record.neme + '的禁用状态'
+			})
+		: null;
+
+	const forbidden = (current) => {
+		dispatch({
+			type: 'usertablemodels/ToggleActiveStatus',
+			payload: {
+				id: record.id
+			}
+		});
+		dispatch({
+			type: 'usertablemodels/GetUsers',
+			payload: {}
+		});
+	};
+	// 删除
+	function deletes() {
+		console.log(record);
+		confirm({
+			title: '警告',
+			content: '你确定要删除' + record.name + '用户?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/DeleteUser',
+					payload: {
+						id: record.id
+					}
+				});
+				dispatch({
+					type: 'usertablemodels/GetUsers',
+					payload: {}
+				});
+			},
+			onCancel() {
+				console.log('Cancel');
+			}
+		});
 	}
 	const menus = (
 		<Menu>
 			<Menu.Item>
-				<a href="javascript:;" onClick={compile}>编辑</a>
+				<a href="javascript:;" onClick={compile}>
+					编辑
+				</a>
 			</Menu.Item>
 			<Menu.Item>
-				<a href="javascript:;">修改权限</a>
+				<a href="javascript:;" onClick={jurisdiction}>
+					修改权限
+				</a>
 			</Menu.Item>
 			<Menu.Item>
-				<a href="javascript:;">重置密码</a>
+				<a href="javascript:;" onClick={showConfirm}>
+					重置密码
+				</a>
 			</Menu.Item>
 			<Menu.Item>
-				<a href="javascript:;">修改密码</a>
+				<a href="javascript:;" onClick={showModelC}>
+					修改密码
+				</a>
 			</Menu.Item>
 			<Menu.Item>
-				<a href="javascript:;">禁用</a>
+				<a href="javascript:;" onClick={forbidden}>
+					{record.isActive ? '禁用' : '启用'}
+				</a>
 			</Menu.Item>
 			<Menu.Item>
-				<a
-					rel="noopener noreferrer"
-					href="javascript:;"
-					//  onClick={confirm}
-				>
+				<a href="javascript:;" onClick={deletes}>
 					删除
 				</a>
 			</Menu.Item>
@@ -275,7 +366,6 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 		});
 	};
 	function onChange(pagination, filters, sorter) {
-	
 		dispatch({
 			type: 'usertablemodels/GetUsers',
 			payload: {
@@ -289,40 +379,164 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 	}
 	const rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
-			 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-			 
-			 dispatch({
-				 type:'usertablemodels/setState',
-				 payload:{
-					 Ids:`${selectedRowKeys}`
-				 }
-			 })
-		 },
-		// onSelect: (record, selected, selectedRows) => {
-		// 	console.log(record, selected, selectedRows);
-		// },
-		// onSelectAll: (selected, selectedRows, changeRows) => {
-		// 	console.log(selected, selectedRows, changeRows);
-		// }
+			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+
+			dispatch({
+				type: 'usertablemodels/setState',
+				payload: {
+					Ids: selectedRowKeys,
+					names: selectedRows
+				}
+			});
+		}
 	};
 	function showTotal(totalCount) {
 		return `共 ${totalCount} 条`;
 	}
 	const Search = Input.Search;
 	// 批量操作
+
+	//
+	const batchDeleteUser = () => {
+		confirm({
+			title: '警告',
+			content: '你确定要删除' + names[0].name + '等' + Ids.length + '名用户?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/BatchDeleteUser',
+					payload: {
+						value: Ids
+					}
+				});
+				dispatch({
+					type: 'usertablemodels/GetUsers',
+					payload: {}
+				});
+			},
+			onCancel() {}
+		});
+	};
+	const batchActiveUser = () => {
+		confirm({
+			title: '警告',
+			content: '你确定要启用' + names[0].name + '等' + Ids.length + '名用户?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/BatchActiveUser',
+					payload: {
+						Ids: Ids,
+						isActive: true,
+						value: Ids
+					}
+				});
+				dispatch({
+					type: 'usertablemodels/GetUsers',
+					payload: {}
+				});
+			},
+			onCancel() {}
+		});
+	};
+	const batchActiveUserA = () => {
+		confirm({
+			title: '警告',
+			content: '你确定要禁用' + names[0].name + '等' + Ids.length + '名用户?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/BatchActiveUser',
+					payload: {
+						Ids: Ids,
+						value: Ids,
+						isActive: false
+					}
+				});
+				dispatch({
+					type: 'usertablemodels/GetUsers',
+					payload: {}
+				});
+			},
+			onCancel() {}
+		});
+	};
+	const batchUnlockUser = () => {
+		confirm({
+			title: '警告',
+			content: '你确定要解锁' + names[0].name + '等' + Ids.length + '名用户?',
+			onOk() {
+				dispatch({
+					type: 'usertablemodels/BatchUnlockUser',
+					payload: {
+						Ids: Ids,
+						value: Ids
+					}
+				});
+				dispatch({
+					type: 'usertablemodels/GetUsers',
+					payload: {}
+				});
+			},
+			onCancel() {}
+		});
+	};
 	const mores = (
 		<Menu>
-			<Menu.Item  >批量删除</Menu.Item>
-			<Menu.Item >批量解锁</Menu.Item>
-			<Menu.Item >批量禁用</Menu.Item>
-			<Menu.Item >批量启用</Menu.Item>
+			<Menu.Item onClick={batchDeleteUser}>批量删除</Menu.Item>
+			<Menu.Item onClick={batchUnlockUser}>批量解锁</Menu.Item>
+			<Menu.Item onClick={batchActiveUserA}>批量禁用</Menu.Item>
+			<Menu.Item onClick={batchActiveUser}>批量启用</Menu.Item>
 		</Menu>
+	);
+	// 按需加载
+	let columns = fullColumns.filter(function(column) {
+		return validColumns.filter((v) => v == column.dataIndex).length > 0;
+	});
+	function onChanges(dataIndex, e) {
+		
+		if (e.target.checked) {
+			validColumns.push(dataIndex);
+		} else {
+			validColumns = validColumns.filter((v) => v != dataIndex);
+		}
+		dispatch({
+			type: 'usertablemodels/setState',
+			payload: { validColumns: JSON.parse(JSON.stringify(validColumns)) }
+		});
+	}
+	const alls=()=>{
+		dispatch({
+			type: 'usertablemodels/setState',
+			payload: {
+				validColumns:['name','userName','id','roles[0].roleName','emailAddress',
+				'phoneNumber','isEmailConfirmed','isPhoneNumberConfirmed',
+			'isActive','isLocked','lastLoginTime','creationTime','idCode','operation']
+			 }
+		});
+	}
+	const content = (
+		<div style={{ width: '300px' }}>
+			<div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+				<span>列表显示条目</span>
+				<a href="javascript:;" onClick={alls
+
+				}>恢复默认</a>
+			</div>
+			{fullColumns.map((column) => (
+				
+				<Checkbox
+					style={{ margin: '0', width: '50%' }}
+					checked={validColumns.filter((v) => v == column.dataIndex).length > 0}
+					onChange={onChanges.bind(this, column.dataIndex)}
+				>
+				
+					{column.title}
+				</Checkbox>
+			))}
+		</div>
 	);
 	return (
 		<div>
 			{/* 编辑 */}
-
-			<CompileUsers/>
+			<CompileUsers />
 			<div style={{ marginBottom: 15, borderBottom: '1px solid #e0e0e0' }}>
 				<Search
 					placeholder="输入关键字搜索，将搜索[用户名][姓名][邮箱][手机号]"
@@ -368,13 +582,20 @@ function UserTable({ dispatch, users, ceshi, totalCount, size, fileName, fileTok
 					<Dropdown overlay={mores}>
 						<Button>
 							更多操作 <Icon type="down" />
-							</Button>
-					</Dropdown>,
+						</Button>
+					</Dropdown>
+					<div style={{ marginLeft: '1092px' }}>
+					<Popover placement="bottom" content={content} title="列表显示条目">
+						<Button>
+							自定义列表条目 <Icon type="down" />
+						</Button>
+					</Popover>
+					</div>
 				</div>
 			</div>
 			<Table
-			rowKey='id'
-				columns={fullColumns}
+				rowKey="id"
+				columns={columns}
 				onChange={onChange}
 				bordered
 				dataSource={users}
