@@ -1,3 +1,4 @@
+// 编辑用户
 import React from 'react';
 import { connect } from 'dva';
 import {
@@ -11,8 +12,8 @@ import {
 	Modal
 } from 'antd';
 
-function CompileUser({ form, confirmDirty, result, dispatch, checked, visibleA, checkedValues, tree, checkedKeys,record,arr,lengths }) {
-	console.log(lengths, '树');
+function CompileUser({checkTree,visibleC, form, confirmDirty, result, dispatch, checked, visibleA, checkedValues, tree, checkedKeys,record,arr,lengths,visibleB,jurisdictionTree }) {
+ console.log(jurisdictionTree, '树18');
 
 	const formItemLayout = {
 		labelCol: {
@@ -78,19 +79,26 @@ console.log(e,"真")
 	};
 
 	let onCheck = (checkedKeys, info) => {
-		// console.log('onCheck', checkedKeys, info);
+		 console.log('onCheck', checkedKeys);
 		dispatch({
 			type: 'usertablemodels/setState',
 			payload: {
-				checkedKeys: checkedKeys.checked
+				checkTree: checkedKeys
 			}
 		});
 	};
 	const handleOk = (e) => {
 		dispatch({
 			type: 'usertablemodels/setState',
-			payload: { visibleA: false }
+			payload: { visibleB: false }
 		});
+		dispatch({
+			type:'usertablemodels/UpdateUserPermissions',
+			payload:{
+				grantedPermissionNames:checkTree,
+				id:record.id
+			}
+		})
 	};
 	const handleCancel = (e) => {
 		dispatch({
@@ -99,56 +107,145 @@ console.log(e,"真")
 		});
 	};
 
-	let showModal = () => {
+	let showModalB = () => {
 		dispatch({
 			type: 'usertablemodels/setState',
-			payload: { visibleA: true }
+			payload: { visibleB: false }
+		});
+	};
+	let showModalC = () => {
+		dispatch({
+			type: 'usertablemodels/setState',
+			payload: { visibleC: false }
+		});
+	};
+	let recover = () => {
+		dispatch({
+			type: 'usertablemodels/ResetUserSpecificPermissions',
+			payload: {
+				id:record.id
+			 }
 		});
 	};
 	function onChange(checkedValues) {
 		console.log(checkedValues)
 		dispatch({
 			type: 'usertablemodels/setState',
-			payload: { checkedValues: checkedValues ,
+			payload: { lengths: checkedValues ,
 			// arr:checkedValues
 			}
 		});
 	}
 	const CheckboxGroup = Checkbox.Group;
 	function treeDom(data) {
+		
 		return data.map((items, index) => {
 			if (items.children && items.children.length) {
 				return (
-					<TreeNode title={items.displayName} key={items.id}>
+					<TreeNode title={items.displayName} key={items.name}>
 						{treeDom(items.children)}
 					</TreeNode>
 				);
 			}
-			return <TreeNode key={items.id} title={items.displayName} />;
+			return <TreeNode key={items.name} title={items.displayName} />;
 		});
 	}
 
-	function cao(data) {
+	function cao(datas) {
+		var data=datas.permissions
 		return (
-			<Tree checkable={true} checkStrictly={true} onSelect={onSelect} onCheck={onCheck}>
+			<Tree checkable={true}  onSelect={onSelect} onCheck={onCheck} defaultCheckedKeys={datas.grantedPermissionNames}>
 				{treeDom(data)}
 			</Tree>
 		);
 	}
-	
-// 	arr.map((items)=>{
-// 	items?(
-// 		items=='Admin'?'Admin':null,
-// 		items=='安全员'?'50d31fd08541499eb18af45ebd0674a4':null,
-// 		items=='信息员'?'c7ec25e79ca54f92a3e3c9e86cabcd43':null,
-// 		items=='财务'?'1477abd906fc45fdbb89a0553174052b':null,
+	// 修改密码
+	let handleSubmitC = (e) => {
+		e.preventDefault();
 
+		form.validateFields((err, values) => {
+			if (!err) {
+				console.log(values.remember);
+				
+				if (values.newPassword == values.password) {
+					dispatch({
+						type: 'usertablemodels/ChangeUserPassword',
+						payload: {
+							userid:record.id,
+							newPassword: values.newPassword
+						}
+					});
+					dispatch({
+						type: 'usertablemodels/setState',
+						payload: {
+							visibleC: false
+						}
+					});
+				} else {
+					
+					dispatch({
+						type: 'usertablemodels/setState',
+						payload: {
+							visibleC: true
+						}
+					});
+				}
+			}
+		});
+	};
 
-// 	):null,
-	
-// }))
+// // 树结构
+
 	return (
 		<div>
+			{visibleC?<Modal
+			
+			title="修改密码"
+			visible={visibleC}
+			onOk={handleSubmitC}
+			onCancel={showModalC}
+			>
+<Form labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} onSubmit={handleSubmitC}>
+						<Form.Item label="新密码：">
+							{getFieldDecorator('newPassword', {
+								rules: [ { required: true, message: '请输入密码' } ]
+							})(<Input type="password" />)}
+						</Form.Item>
+
+						<Form.Item label="确认密码:">
+							{getFieldDecorator('password', {
+								rules: [
+									{
+										required: true,
+										message: '请输入密码!'
+									},
+									{
+										
+									}
+								]
+							})(<Input type="password" />)}
+						</Form.Item>
+
+					
+					</Form>
+			</Modal>:null}
+			{visibleB?<Modal 
+			
+			title="修改权限"
+			visible={visibleB}
+			
+	footer={
+		<div>
+		<Button onClick={handleOk}>保存</Button>
+		<Button onClick={showModalB}>取消</Button>
+		<Button onClick={recover}>恢复默认权限</Button>
+		</div>
+	}
+		onCancel={showModalB}>
+		
+		{jurisdictionTree?cao(jurisdictionTree):null}
+
+			</Modal>:null}
 			
 			{visibleA?<Modal
 				cancelText="取消"
@@ -239,7 +336,7 @@ console.log(e,"真")
 						<TabPane
 							tab="角色"
 							tab={
-								<Badge count={arr.length} offset={[ 10, 0 ]} size={'large'}>
+								<Badge count={lengths.length} offset={[ 10, 0 ]} size={'large'}>
 									角色
 								</Badge>
 							}
@@ -248,9 +345,7 @@ console.log(e,"真")
 							<CheckboxGroup
 								onChange={onChange}
 								defaultValue={
-									
-								arr
-								
+									lengths
 							}
 							>
 								{result ? (
@@ -267,7 +362,7 @@ console.log(e,"真")
 								placeholder="输入关键字搜索，将搜索[用户名][姓名][邮箱][手机号]"
 								style={{ width: 400, marginBottom: 15 }}
 							/>
-							{tree ? cao(tree) : null}
+							
 						</TabPane>
 					</Tabs>
 				</Form>

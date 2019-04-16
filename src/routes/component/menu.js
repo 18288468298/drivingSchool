@@ -20,13 +20,16 @@ import {
 	Badge,
 
 } from 'antd';
-import { Route, Link } from 'dva/router';
+import { Route, Link,Switch,HashRouter } from 'dva/router';
 import UserTable from './usertable';
+import Organizations from './organization';
+
 import { getCookie } from '../../utils/request';
 import moment from 'moment';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 
 import RoleMangement from './roleMangement';
+
 function Menus({
 	collapsed,
 	dispatch,
@@ -564,13 +567,15 @@ function Menus({
 											</span>
 										}
 									>
+									
 										{items.items ? (
+											
 											items.items.map((array, indexs) => (
 												<Menu.Item key={array.url}>
 													<Icon type={array.icon} />
 													<span>{array.displayName}</span>
-													{array.url == '/user' ? <Link to="/menu/usertable" /> : null}
-													{array.url == '/role' ? <Link to="/menu/role" /> : null}
+													<Link to={"/menu"+array.url}>{array.displayName}</Link>
+													
 												</Menu.Item>
 											))
 										) : null}
@@ -619,8 +624,14 @@ function Menus({
 						minHeight: 400
 					}}
 				>
-					<Route path="/menu/usertable" component={UserTable} />
-					<Route path="/menu/role" component={RoleMangement} />
+				<HashRouter>
+				<Switch>
+					<Route path="/menu/user" component={UserTable} />
+					<Route path="/menu/role" exact component={RoleMangement} />
+					<Route path="/menu/organization" component={Organizations} />
+					
+					</Switch>
+					</HashRouter>
 					{/* <UserTable/> */}
 				</Content>
 

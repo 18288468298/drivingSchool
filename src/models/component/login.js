@@ -18,14 +18,21 @@ export default {
 			// 		return unescape(arr[2]);
 			// 	} else return null;
 			// }
+			// return history.listen(({ pathname, state }) => {
+            //     if (pathname.toLowerCase().indexOf('/login') > -1) {
+			// 		dispatch({
+			// 			type:"autofetch",
+						
+			// 		})
+
+            //     }
+            // });
+        }	
 			
-			
-		dispatch({
-			type:"autofetch",
-			
-		})
+		
 				
-			}
+			
+		
 		
 	},
 

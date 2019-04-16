@@ -54,7 +54,7 @@ export default {
         },
         *GetCurrentLoginInformations({ payload }, { call, put }) {
 			const result = yield call(GetCurrentLoginInformations, payload);
-			console.log(result.data.result.user,12);
+			
 			yield put({
 				type: 'setState',
 				payload: {
